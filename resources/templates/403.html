@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xlmns:th="http://www.thymeleaf.org"
+xlmns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+layout:decorator="template1" >
+
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<title>Votre Banque</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="col-md-6 col-md-offset-3">
+			<div class= "panel panel-primary">
+				<div class="panel-heading">Problème d'Autorisation</div>
+				<div class="panel-body">
+					<div class="text-danger" >
+						vous n'avez pas le droit d'acceder a cette ressource
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<footer class="container-fluid text-center">
+  		<div class="navbar-fixed-bottom">	
+  			<p>Copyright &copy 2018</p>
+		</div>
+</footer>	
+</body>
+</html>

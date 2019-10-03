@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xlmns:th="http://www.thymeleaf.org"
+xlmns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+xlmns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+layout:decorator="template1" >
+
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<title>Votre Banque</title>
+</head>
+<body>
+<header>
+		<nav class="navbar navbar-default">
+		  <div class="container-fluid">
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>                        
+		      </button>
+		      <a class="navbar-brand" href="#">MaBanque+</a>
+		    </div>
+		    <div class="collapse navbar-collapse" id="myNavbar">
+		      <ul class="nav navbar-nav">
+		        <li class="active"><a href="#">Home</a></li>
+		        <li ><a th:href="@{/operations}">Operation</a></li>
+		      </ul>
+		      <ul class="nav navbar-nav navbar-right">
+		        <li ><a th:href="@{/login?logout}">Logout</a></li>
+		      </ul>
+		    </div>
+		  </div>
+		</nav>
+	</header>	
+	<div layout:fragment="content">
+		<div class="col-md-6">
+			<div class= "panel panel-primary">
+				<div class="panel-heading">Consultaion d'un compte</div>
+				<div class="panel-body">
+					<form th:action="@{/consulterCompte}" method="get">
+						<div>
+							<label>code compte : </label>
+							<input type="text" name="codeCompte" required>
+							<button type="submit" class="btn btn-primary">chercher</button>
+						</div>
+					</form>
+					<div class="text-danger" th:if="${exception}" th:text="${exception.message}"></div>
+				</div>
+			</div>
+			<div class= "panel panel-primary" th:if="${compte}">
+				<div class="panel-heading">Information sur le compte</div>
+				<div class="panel-body">
+					<div>	
+						<label>client : </label>
+						<label th:text="${compte.client.nom}"></label> 
+					</div>
+					<div>	
+						<label>code : </label>
+						<label th:text="${compte.codeCompte}"></label> 
+					</div>
+					<div>	
+						<label>solde : </label>
+						<label th:text="${compte.solde}"></label> 
+					</div>
+					<div>	
+						<label>date de création : </label>
+						<label th:text="${compte.dateCreation}"></label> 
+					</div>
+					<div>	
+						<label>Type : </label>
+						<label th:text="${compte.class.simpleName}"></label> 
+					</div>
+					 <div  th:if="${compte.class.simpleName == 'CompteCourant'}">	
+						<label>Découvert : </label>
+						<label th:text="${compte.decouvert"></label> 
+					</div>
+					<div  th:if="${compte.class.simpleName == 'CompteEpargne'}">	
+						<label>Taux : </label>
+						<label th:text="${compte.taux}"></label> 
+					</div>  
+				
+				</div>
+			</div>
+			
+		</div>
+		<div class="col-md-6" >
+		<div sec:authorize="hasRole('ROLE_ADMIN')">
+			<div class= "panel panel-primary" th:if="${compte}">
+				<div class="panel-heading">Opérations sur le compte</div>
+				<div class="panel-body">
+					<form th:action="@{/saveOperation}" method="POST">
+						<div>
+							<label>Compte : </label>
+							<input type="hidden" name="codeCompte" th:value="${compte.codeCompte}">
+							<label th:text = "${compte.codeCompte}"></label>
+							<div>
+								<input type="radio" name="typeOperation" value="VIR" checked="checked"
+								onchange="document.getElementById('pourvirement').style.display='block'">
+								<label>Virement </label>
+								<input type="radio" name="typeOperation" value="VERS" 
+								onchange="document.getElementById('pourvirement').style.display='none'">
+								<label>Versement</label>
+								<input type="radio" name="typeOperation" value="RETR"
+								onchange="document.getElementById('pourvirement').style.display='none'">
+								<label>Retrait </label>
+							</div>
+							<div id="pourvirement">
+								<label>Vers : </label>
+								<input type="text" name="codeCompte2" required>
+							</div>
+							<div>
+								<label>Montant : </label>
+								<input type="text" name="montant" required>
+							</div>
+								<button type="submit" class="btn btn-primary">valider</button>
+								<div class="text-danger"  th:text="${#httpServletRequest.getParameter('error')}"></div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class= "panel panel-primary" th:if="${compte}">
+				<div class="panel-heading">Liste des Opérations</div>
+				<div class="panel-body">
+					<table class="table table-hover">
+						<tr>
+							<th>num</th>
+							<th>Type</th>
+							<th>date</th>
+							<th>montant</th>
+						</tr>
+						<tr th:each="o:${listeoperations}">
+							<th th:text="${o.numero}"></th>
+							<th th:text="${o.class.simpleName}"></th>
+							<th th:text="${o.dateOperation}"></th>
+							<th th:text="${o.montant}"></th>
+						</tr>
+					</table>
+					<div class="container">
+						<ul class="nav nav-pills">
+							<li th:each="p,status:${pages}">
+								<a th:href="@{consulterCompte(codeCompte=${compte.codeCompte},page=${status.index})}" th:text="${status.index}"></a>
+							</li> 
+						</ul>
+					</div>					
+				</div>
+			</div>
+		</div>
+	</div>
+<footer class="container-fluid text-center">
+  		<div class="navbar-fixed-bottom">	
+  			<p>Copyright &copy 2018</p>
+		</div>
+</footer>	
+</body>
+</html>
